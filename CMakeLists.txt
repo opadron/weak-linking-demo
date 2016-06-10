@@ -11,6 +11,15 @@ set(LIB_TYPE SHARED CACHE STRING "library type")
 set(WEAK_LINK_MODULE true CACHE BOOL "weakly link module against library")
 set(WEAK_LINK_EXE    false CACHE BOOL "weakly link executable against library")
 
+# XXX Add try_compile test ?
+set(DYNAMIC_LOOKUP_SUPPORTED ${APPLE})
+
+set(msg "Link flag '-undefined dynamic_lookup' supported")
+if(DYNAMIC_LOOKUP_SUPPORTED)
+  message(STATUS "${msg} - yes")
+else()
+  message(STATUS "${msg} - no")
+endif()
 
 # LIBRARY (number)
 add_library(number ${LIB_TYPE} number.c)
@@ -19,7 +28,7 @@ add_library(number ${LIB_TYPE} number.c)
 # MODULE (counter)
 add_library(counter MODULE counter.c)
 set_target_properties(counter PROPERTIES PREFIX "")
-if(WEAK_LINK_MODULE)
+if(WEAK_LINK_MODULE AND DYNAMIC_LOOKUP_SUPPORTED)
     set_target_properties(counter
                           PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
 else()
