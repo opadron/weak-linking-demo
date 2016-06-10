@@ -48,6 +48,7 @@ if(WEAK_LINK_EXE)
 else()
     target_link_libraries(main number)
 endif()
+target_link_libraries(main ${CMAKE_DL_LIBS})
 
 add_test(NAME main COMMAND main)
 
