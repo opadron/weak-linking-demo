@@ -33,14 +33,14 @@ for lib_type in SHARED STATIC ; do
 
             cmake ../.. -DLIB_TYPE="$lib_type"         \
                         -DWEAK_LINK_MODULE="$weak_mod" \
-                        -DWEAK_LINK_EXE="$weak_exe" > $testcase_configure_log.txt 2>&1
+                        -DWEAK_LINK_EXE="$weak_exe" > ${testcase}_configure_log.txt 2>&1
             if [[ $? == 0 ]]; then
               echo "$testcase [configure success]"
             else
               echo "$testcase [configure failure]"
             fi
 
-            make > $testcase_build_log.txt 2>&1
+            make > ${testcase}_build_log.txt 2>&1
             if [[ $? == 0 ]]; then
               echo "$testcase [build ... success]"
             else
