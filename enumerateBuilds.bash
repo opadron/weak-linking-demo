@@ -1,5 +1,11 @@
 #! /usr/bin/env bash
 
+echo "<LIB_TYPE><LINK_MOD><LINK_EXE>"
+echo "LIB_TYPE: d -> SHARED, s-> STATIC"
+echo "LINK_MOD: 1 -> weak, 0 -> strong"
+echo "LINK_EXE: 1 -> weak, 0 -> strong"
+echo ""
+
 for lib_type in SHARED STATIC ; do
     if [ "$lib_type" '=' 'SHARED' ] ; then
         L='d'
@@ -25,24 +31,20 @@ for lib_type in SHARED STATIC ; do
             pushd "_build/$L$link_mod$link_exe" > /dev/null 2>&1
             testcase=${L}${link_mod}${link_exe}
 
-            what="Configuring $testcase"
-            echo $what
             cmake ../.. -DLIB_TYPE="$lib_type"         \
                         -DWEAK_LINK_MODULE="$weak_mod" \
                         -DWEAK_LINK_EXE="$weak_exe" > $testcase_configure_log.txt 2>&1
             if [[ $? == 0 ]]; then
-              echo "$what - success"
+              echo "$testcase [configure success]"
             else
-              echo "$what - failure"
+              echo "$testcase [configure failure]"
             fi
 
-            what="Building $testcase"
-            echo $what
             make > $testcase_build_log.txt 2>&1
             if [[ $? == 0 ]]; then
-              echo "$what - success"
+              echo "$testcase [build ... success]"
             else
-              echo "$what - failure"
+              echo "$testcase [build ... failure]"
             fi
 
             popd > /dev/null 2>&1
