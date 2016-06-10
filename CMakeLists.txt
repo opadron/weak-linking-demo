@@ -38,7 +38,7 @@ endif()
 
 # EXECUTABLE (main)
 add_executable(main main.c)
-if(WEAK_LINK_EXE)
+if(WEAK_LINK_EXE AND DYNAMIC_LOOKUP_SUPPORTED)
     set_target_properties(main
                           PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
 else()
