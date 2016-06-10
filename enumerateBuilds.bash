@@ -22,12 +22,30 @@ for lib_type in SHARED STATIC ; do
             fi
 
             mkdir -p "_build/$L$link_mod$link_exe"
-            pushd "_build/$L$link_mod$link_exe"
+            pushd "_build/$L$link_mod$link_exe" > /dev/null 2>&1
+            testcase=${L}${link_mod}${link_exe}
+
+            what="Configuring $testcase"
+            echo $what
             cmake ../.. -DLIB_TYPE="$lib_type"         \
                         -DWEAK_LINK_MODULE="$weak_mod" \
-                        -DWEAK_LINK_EXE="$weak_exe"
-            make
-            popd
+                        -DWEAK_LINK_EXE="$weak_exe" > $testcase_configure_log.txt 2>&1
+            if [[ $? == 0 ]]; then
+              echo "$what - success"
+            else
+              echo "$what - failure"
+            fi
+
+            what="Building $testcase"
+            echo $what
+            make > $testcase_build_log.txt 2>&1
+            if [[ $? == 0 ]]; then
+              echo "$what - success"
+            else
+              echo "$what - failure"
+            fi
+
+            popd > /dev/null 2>&1
         done
     done
 done
