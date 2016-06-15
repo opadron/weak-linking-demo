@@ -33,7 +33,7 @@ Dependency graph looks like this:
 ```
 git clone git://github.com/opadron/weak-linking-demo
 cd weak-linking-demo
-./enumerateBuilds.bash
+./testAllBuilds.bash
 ```
 
 Will create a build for every combination of the relevant variables: whether to
@@ -42,7 +42,7 @@ into the MOD (1) or to weakly link it (0), and whether to normally link it into
 the EXE (1) or to weakly link it (0).
 
 ```
-./testBuild.bash d01
+./enumerateBuild.bash d01
   or
 ./runBuild.bash d01
 ```

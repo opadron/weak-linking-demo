@@ -7,9 +7,11 @@ project(weak_linking_example C)
 include(CTest)
 enable_testing()
 
-if(NOT DEFINED DOUBLE_LINK_OK)
-    set(TC_SRC_DIR "${CMAKE_BINARY_DIR}/try_compile_src/double-link")
-    set(TC_BIN_DIR "${CMAKE_BINARY_DIR}/try_compile_build/double-link")
+if(NOT DEFINED CAN_DOUBLE_LINK)
+    set(TC_SRC_DIR
+        "${CMAKE_BINARY_DIR}/try_compile_src/double-link")
+    set(TC_BIN_DIR
+        "${CMAKE_BINARY_DIR}/try_compile_build/double-link")
 
     file(MAKE_DIRECTORY ${TC_SRC_DIR})
     file(MAKE_DIRECTORY ${TC_BIN_DIR})
@@ -19,7 +21,7 @@ if(NOT DEFINED DOUBLE_LINK_OK)
         include_directories(${TC_SRC_DIR})
         project(double_link_try C)
 
-        add_library(number number.c)
+        add_library(number SHARED number.c)
 
         add_library(counter MODULE counter.c)
         set_target_properties(counter PROPERTIES PREFIX \"\")
@@ -29,8 +31,7 @@ if(NOT DEFINED DOUBLE_LINK_OK)
         target_link_libraries(main number)
         target_link_libraries(main ${CMAKE_DL_LIBS})
 
-        install(TARGETS number  LIBRARY DESTINATION \"${TC_BIN_DIR}\"
-                                ARCHIVE DESTINATION \"${TC_BIN_DIR}\")
+        install(TARGETS number  LIBRARY DESTINATION \"${TC_BIN_DIR}\")
         install(TARGETS counter LIBRARY DESTINATION \"${TC_BIN_DIR}\")
         install(FILES   main            DESTINATION \"${TC_BIN_DIR}\")
     ")
@@ -110,24 +111,33 @@ if(NOT DEFINED DOUBLE_LINK_OK)
     ")
 
     try_compile(double_link_compiles
-                "${TC_BIN_DIR}" "${TC_SRC_DIR}" "double_link_try")
+                "${TC_BIN_DIR}"
+                "${TC_SRC_DIR}"
+                "double_link_try")
 
+    set(double_link_works 1)
     if(double_link_compiles)
         execute_process(COMMAND "${TC_BIN_DIR}/main"
                         WORKING_DIRECTORY "${TC_BIN_DIR}"
-                        RESULT_VARIABLE double_link_works
-                        OUTPUT_QUIET ERROR_QUIET)
+                        RESULT_VARIABLE double_link_works)
+    endif()
+
+    if(double_link_works EQUAL 0)
+        set(double_link_works TRUE)
     else()
         set(double_link_works FALSE)
     endif()
 
-    set(DOUBLE_LINK_OK ${double_link_works} CACHE BOOL "ok to double link")
+    set(CAN_DOUBLE_LINK
+        ${double_link_works} CACHE BOOL "ok to double link")
 endif()
 
 
 IF(NOT DEFINED HAS_DYNAMIC_LOOKUP)
-    set(TC_SRC_DIR "${CMAKE_BINARY_DIR}/try_compile_src/dynamic-lookup")
-    set(TC_BIN_DIR "${CMAKE_BINARY_DIR}/try_compile_build/dynamic-lookup")
+    set(TC_SRC_DIR
+        "${CMAKE_BINARY_DIR}/try_compile_src/dynamic-lookup")
+    set(TC_BIN_DIR
+        "${CMAKE_BINARY_DIR}/try_compile_build/dynamic-lookup")
 
     file(MAKE_DIRECTORY ${TC_SRC_DIR})
     file(MAKE_DIRECTORY ${TC_BIN_DIR})
@@ -137,7 +147,7 @@ IF(NOT DEFINED HAS_DYNAMIC_LOOKUP)
         include_directories(${TC_SRC_DIR})
         project(dynamic_lookup_try C)
 
-        add_library(number number.c)
+        add_library(number SHARED number.c)
 
         add_library(counter MODULE counter.c)
         set_target_properties(counter PROPERTIES PREFIX \"\")
@@ -149,8 +159,7 @@ IF(NOT DEFINED HAS_DYNAMIC_LOOKUP)
         target_link_libraries(main number)
         target_link_libraries(main ${CMAKE_DL_LIBS})
 
-        install(TARGETS number  LIBRARY DESTINATION \"${TC_BIN_DIR}\"
-                                ARCHIVE DESTINATION \"${TC_BIN_DIR}\")
+        install(TARGETS number  LIBRARY DESTINATION \"${TC_BIN_DIR}\")
         install(TARGETS counter LIBRARY DESTINATION \"${TC_BIN_DIR}\")
         install(FILES   main            DESTINATION \"${TC_BIN_DIR}\")
     ")
@@ -230,13 +239,19 @@ IF(NOT DEFINED HAS_DYNAMIC_LOOKUP)
     ")
 
     try_compile(dynamic_lookup_compiles
-                "${TC_BIN_DIR}" "${TC_SRC_DIR}" "dynamic_lookup_try")
+                "${TC_BIN_DIR}"
+                "${TC_SRC_DIR}"
+                "dynamic_lookup_try")
 
+    set(dynamic_lookup_works 1)
     if(dynamic_lookup_compiles)
         execute_process(COMMAND "${TC_BIN_DIR}/main"
                         WORKING_DIRECTORY "${TC_BIN_DIR}"
-                        RESULT_VARIABLE dynamic_lookup_works
-                        OUTPUT_QUIET ERROR_QUIET)
+                        RESULT_VARIABLE dynamic_lookup_works)
+    endif()
+
+    if(dynamic_lookup_works EQUAL 0)
+        set(dynamic_lookup_works TRUE)
     else()
         set(dynamic_lookup_works FALSE)
     endif()
@@ -245,14 +260,15 @@ IF(NOT DEFINED HAS_DYNAMIC_LOOKUP)
         CACHE BOOL "linker supports dynamic_lookup")
 endif()
 
+
 function(target_weak_link_libraries target)
     if(HAS_DYNAMIC_LOOKUP)
         set_target_properties(${target}
                               PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
-    elseif(DOUBLE_LINK_OK)
+    elseif(CAN_DOUBLE_LINK)
         target_link_libraries(${target} ${ARGN})
     else()
-        message(FATAL_ERROR "Cannot weak link")
+        message(FATAL_ERROR "Cannot weak link target: ${target}")
     endif()
 endfunction()
 
@@ -260,6 +276,7 @@ endfunction()
 set(LIB_TYPE         SHARED CACHE STRING "library type")
 set(WEAK_LINK_MODULE TRUE   CACHE BOOL "weakly link module against library")
 set(WEAK_LINK_EXE    FALSE  CACHE BOOL "weakly link executable against library")
+
 
 # LIBRARY (number)
 add_library(number ${LIB_TYPE} number.c)
