@@ -2,4 +2,5 @@
 
 cd _build/$1
 ./main
+exit $?
 

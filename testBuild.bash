@@ -2,4 +2,5 @@
 
 cd _build/$1
 make test
+exit $?
 
