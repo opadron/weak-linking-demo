@@ -2,7 +2,7 @@
 #### weak-linking-example
 
 Demonstrates the mechanics of a technique called "weak-linking" in a CMake
-project (Mac OSX only).
+project (Linux and Mac OSX).
 
 Application is split into three parts:
   - Library implementing `set_number()` and `get_number()` for a hidden, shared
