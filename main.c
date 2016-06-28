@@ -1,11 +1,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <defer.h>
-
 #include <dlfcn.h>
-
-#include <number.h>
 
 int my_count() {
     int result = get_number();
@@ -14,20 +10,31 @@ int my_count() {
 }
 
 int main(int argc, char **argv) {
-    int i;
     void *counter_module;
     int (*count)(void);
+    int i, n;
+    int result;
 
-    counter_module = dlopen("counter.so", 0);
-    DEFER dlclose(counter_module);
+    counter_module = dlopen("./counter.so", RTLD_LAZY);
+    if(!counter_module) goto error;
 
     count = dlsym(counter_module, "count");
+    if(!count) goto error;
 
+    result = 0;
     for(i=0; i<10; ++i) {
-        printf("%d\n", (i%2 ? count() : my_count()));
+        n = ((i%2) ? count : my_count)();
+        result = (result || n != i) ? 1 : 0;
+        printf("%d\n", n);
     }
 
-    FULFILL;
-    return EXIT_SUCCESS;
+    goto done;
+    error:
+        fprintf(stderr, "Error occured:\n    %s\n", dlerror());
+        result = 1;
+
+    done:
+        if(counter_module) dlclose(counter_module);
+        return result;
 }
 

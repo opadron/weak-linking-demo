@@ -1,7 +1,7 @@
 
 #include <number.h>
 
-static int _number = 0;
+static int _number;
 
 void set_number(int number) {
     _number = number;
