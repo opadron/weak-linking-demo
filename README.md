@@ -30,6 +30,8 @@ Dependency graph looks like this:
 
 #### Instructions
 
+Add CMake >= 3.5 in your PATH
+
 ```
 git clone git://github.com/opadron/weak-linking-demo
 cd weak-linking-demo
