@@ -219,55 +219,33 @@ function(_test_weak_link_project
     endif()
 
     file(WRITE "${test_project_src_dir}/number.c" "
-      #include <number.h>
-
       static int _number;
-      void set_number(int number) { _number = number; }
-      int get_number() { return _number; }
-    ")
-
-    file(WRITE "${test_project_src_dir}/number.h" "
-      #ifndef _NUMBER_H
-      #define _NUMBER_H
-      extern void set_number(int);
-      extern int get_number(void);
-      #endif
+      int next_number() { return _number++; }
     ")
 
     file(WRITE "${test_project_src_dir}/counter.c" "
-      #include <number.h>
-      int count() {
-        int result = get_number();
-        set_number(result + 1);
-        return result;
-      }
-    ")
-
-    file(WRITE "${test_project_src_dir}/counter.h" "
-      #ifndef _COUNTER_H
-      #define _COUNTER_H
-      extern int count(void);
-      #endif
+      extern int next_number(void);
+      int count() { return next_number(); }
     ")
 
     file(WRITE "${test_project_src_dir}/main.c" "
       #include <stdlib.h>
       #include <stdio.h>
-      #include <number.h>
     ")
 
-    if(NOT link_exe_mod)
+    if(link_exe_mod)
+      file(APPEND "${test_project_src_dir}/main.c" "
+        extern int count(void);
+      ")
+    else()
       file(APPEND "${test_project_src_dir}/main.c" "
         #include <dlfcn.h>
       ")
     endif()
 
     file(APPEND "${test_project_src_dir}/main.c" "
-      int my_count() {
-        int result = get_number();
-        set_number(result + 1);
-        return result;
-      }
+      extern int next_number(void);
+      int my_count() { return next_number(); }
 
       int main(int argc, char **argv) {
         int result;
