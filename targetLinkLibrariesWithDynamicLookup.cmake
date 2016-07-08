@@ -165,6 +165,8 @@ function(_test_weak_link_project
 
     if("${mod_type}" STREQUAL "MODULE")
       set(link_mod_lib FALSE)
+    else()
+      set(link_exe_mod TRUE)
     endif()
 
 
