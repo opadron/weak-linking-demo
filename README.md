@@ -109,3 +109,8 @@ symbols", and `DLLF` for "dynamic library load failure".
 
   1. Duplicate symbols are successfully resolved and coalesced at load time.
 
+Tested on:
+
+ - Arch Linux GCC 6.1.1
+ - Mac OSX 10.11.4 LLVM 7.3.0
+
