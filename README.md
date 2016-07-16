@@ -55,54 +55,62 @@ Replace "d10" with your desired combination to run that particular build.
 
 ##### Expected Results
 
-NOTE: This demo performs two series of host examinations.  The first is to
-determine if the host system supports weak linking.  The second is to determine
-if the dynamic loader can properly merge symbol entries that have been
-duplicated across link boundaries (e.g: Linux).  Even if the host is found to
-not support weak linking, the "weak link" operation would still succeed if the
-loader can cope with duplicate symbols.  In this case, the link is silently
-promoted to a proper linking.
+NOTE: The test step of the demo can fail for a number of reasons.  Their
+abbreviations and meanings are: `RTE` for "runtime error", `DSYM` for "duplicate
+symbols", and `DLLF` for "dynamic library load failure".
 
 ###### Linux (GCC)
 
 |CASE|CONFIG            |BUILD             |TEST              |NOTES|
 |----|------------------|------------------|------------------|----:|
-|s00 |:white_check_mark:|:white_check_mark:|:x:               |  1,2|
-|s01 |:white_check_mark:|:white_check_mark:|:x:               |  1,2|
-|s10 |:white_check_mark:|:white_check_mark:|:x:               |  1,2|
-|s11 |:white_check_mark:|:white_check_mark:|:x:               |  1,2|
-|d00 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    1|
-|d01 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    1|
-|d10 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    1|
-|d11 |:white_check_mark:|:white_check_mark:|:white_check_mark:|  1,6|
+|s00 |:white_check_mark:|:white_check_mark:|:x:RTE            |  1,2|
+|s01 |:white_check_mark:|:white_check_mark:|:x:DSYM           |    3|
+|s10 |:white_check_mark:|:white_check_mark:|:x:RTE            |    2|
+|s11 |:white_check_mark:|:white_check_mark:|:x:DSYM           |    4|
+|d00 |:white_check_mark:|:white_check_mark:|:x:RTE            |    2|
+|d01 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    5|
+|d10 |:white_check_mark:|:white_check_mark:|:x:RTE            |    2|
+|d11 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    7|
 
 ###### OSX (XCODE)
 
 |CASE|CONFIG            |BUILD             |TEST              |NOTES|
 |----|------------------|------------------|------------------|-----|
-|s00 |:white_check_mark:|:white_check_mark:|:x:               |    3|
-|s01 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    4|
-|s10 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    5|
-|s11 |:white_check_mark:|:white_check_mark:|:x:               |    2|
-|d00 |:white_check_mark:|:white_check_mark:|:x:               |    3|
-|d01 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    4|
-|d10 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    5|
-|d11 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    6|
+|s00 |:white_check_mark:|:white_check_mark:|:x:RTE            |    1|
+|s01 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    5|
+|s10 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    6|
+|s11 |:white_check_mark:|:white_check_mark:|:x:DSYM           |    4|
+|d00 |:white_check_mark:|:white_check_mark:|:x:RTE            |    1|
+|d01 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    5|
+|d10 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    6|
+|d11 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    7|
 
 ###### NOTES
 
-  1. On Linux, the only thing that matters is whether the library in question is
-  shared or static.  The dynamic loader doesn't seem to have any problems with
-  multiple identical symbols.
+  1. Test fails due to unresolved symbols.
+
+  1. On Linux, all symbols in a binary's namespace must be resolved when the
+     namespace is instantiated.  Because of this requirement, leaving symbols
+     unresolved in an executable is almost never useful, since the missing
+     symbols must be provided before the executable is even ran (e.g.: using
+     `LD_PRELOAD`).
+
+  1. In the actual system test, the produced binary fails due to unresolved
+     symbols in the module's namespace.  The result is reported as symbol
+     duplication because the check falls back to double-linking in an attempt to
+     produce a working executable (with the same result as the `s11` case).
 
   1. Test case fails unique symbols test (program output looks like
-  `0 0 1 1 2 2 ...` instead of `0 1 2 ...`).
-
-  1. Test fails due to unresolved symbols.
+    `0 0 1 1 2 2 ...` instead of `0 1 2 ...`).
 
   1. Module pulls symbols from the executable (ala Python extension modules).
 
   1. Executable pulls symbols from the module (unusual, but it works).
 
-  1. Duplicate symbols are successfully resolved and unified at load time.
+  1. Duplicate symbols are successfully resolved and coalesced at load time.
+
+Tested on:
+
+ - Arch Linux GCC 6.1.1
+ - Mac OSX 10.11.4 LLVM 7.3.0
 

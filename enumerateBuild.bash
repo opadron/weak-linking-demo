@@ -36,10 +36,10 @@ fi | while read testcase ; do
             &> "../../log/$testcase/configure.txt"
     configure_result="$?"
 
-    make &> "../../log/$testcase/build.txt"
+    make VERBOSE=1 &> "../../log/$testcase/build.txt"
     build_result="$?"
 
-    make test &> "../../log/$testcase/test.txt"
+    ./main &> "../../log/$testcase/test.txt"
     test_result="$?"
 
     code=32
@@ -64,7 +64,14 @@ fi | while read testcase ; do
     result=pass
     if [ "$test_result" '!=' '0' ] ; then
         code=31
-        result=fail
+
+        result="RTE"
+
+        if [ "$test_result" '=' '250' ] ; then # wrong answer
+            result="DSYM"
+        elif [ "$test_result" '=' '251' ] ; then # dl load error
+            result="DLLF"
+        fi
     fi
     test_result="\\e[1;${code}m${result}\\e[0m"
     test_result="$( echo -e "$test_result" )"
@@ -72,5 +79,5 @@ fi | while read testcase ; do
     echo "$testcase   $configure_result   $build_result   $test_result"
 
     popd &> /dev/null
-done
+done 2> /dev/null
 
