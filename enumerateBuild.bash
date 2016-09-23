@@ -2,9 +2,15 @@
 
 mkdir -p log
 
+interactive=false
+if [ "$#" '=' '0' ] ; then
+    echo "Please, type case identifier (e.g d00)"
+    echo ""
+    interactive=true
+fi
 echo "CASE  CONFIG BUILD  TEST"
 
-if [ "$#" '=' '0' ] ; then
+if [ "$interactive" '=' true ] ; then
     cat
 else
     while [ "$#" '!=' '0' ] ; do
