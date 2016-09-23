@@ -61,7 +61,7 @@ symbols", and `DLLF` for "dynamic library load failure".
 
 ###### Linux (GCC)
 
-|CASE|CONFIG            |BUILD             |TEST              |NOTES|
+|CASE|EXPECTED<br>CONFIG|EXPECTED<br>BUILD |EXPECTED<br>TEST  |NOTES|
 |----|------------------|------------------|------------------|----:|
 |s00 |:white_check_mark:|:white_check_mark:|:x:RTE            |  1,2|
 |s01 |:white_check_mark:|:white_check_mark:|:x:DSYM           |    3|
@@ -74,7 +74,7 @@ symbols", and `DLLF` for "dynamic library load failure".
 
 ###### OSX (XCODE)
 
-|CASE|CONFIG            |BUILD             |TEST              |NOTES|
+|CASE|EXPECTED<br>CONFIG|EXPECTED<br>BUILD |EXPECTED<br>TEST  |NOTES|
 |----|------------------|------------------|------------------|-----|
 |s00 |:white_check_mark:|:white_check_mark:|:x:RTE            |    1|
 |s01 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    5|
