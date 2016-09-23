@@ -22,7 +22,8 @@ mkdir -p log
 
 interactive=false
 if [ "$#" '=' '0' ] ; then
-    echo "Please, type case identifier (e.g d00)"
+    echo ""
+    echo ">>> Please, type case identifier (e.g d00) <<<"
     echo ""
     interactive=true
 fi
