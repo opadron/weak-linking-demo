@@ -19,6 +19,10 @@ else
     done
 fi | while read testcase ; do
 
+    if [ "$testcase" '=' '' ]; then
+        continue
+    fi
+
     if [ "${testcase:0:1}" '=' 's' ] ; then
         lib_type="STATIC"
     elif [ "${testcase:0:1}" '=' 'd' ] ; then
