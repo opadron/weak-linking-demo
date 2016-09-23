@@ -8,6 +8,7 @@ if [ "$#" '=' '0' ] ; then
     echo ""
     interactive=true
 fi
+
 echo "CASE  CONFIG BUILD  TEST"
 
 if [ "$interactive" '=' true ] ; then
@@ -23,7 +24,8 @@ fi | while read testcase ; do
     elif [ "${testcase:0:1}" '=' 'd' ] ; then
         lib_type="SHARED"
     else
-        echo "unrecognized test case: $testcase" >&2
+        msg="unrecognized test case: $testcase"
+        [[ $interactive ]] && echo $msg || echo $msg >&2
         exit 1
     fi
 
