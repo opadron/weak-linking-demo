@@ -1,5 +1,23 @@
 #! /usr/bin/env bash
 
+# Usage:
+#
+#   colorized_message <exit_code> <text>
+#
+# Description:
+#
+#   If exit_code is 0, text is displayed in green.
+#   Otherwise it is displayed in red.
+#
+colorized_message() {
+    local exit_code=$1
+    local text=$2
+    code=32 # green
+    [[ $exit_code != 0 ]] && code=31 # red
+    text="\\e[1;${code}m${text}\\e[0m"
+    echo -e "$text"
+}
+
 mkdir -p log
 
 interactive=false
@@ -29,7 +47,7 @@ fi | while read testcase ; do
         lib_type="SHARED"
     else
         msg="unrecognized test case: $testcase"
-        [[ $interactive ]] && echo $msg || echo $msg >&2
+        [[ $interactive ]] && echo $(colorized_message 1 "$msg") || echo $msg >&2
         exit 1
     fi
 
@@ -40,6 +58,7 @@ fi | while read testcase ; do
     mkdir -p "log/$testcase"
     pushd "_build/$testcase" &> /dev/null
 
+    # configure
     cmake ../..                             \
         -DCMAKE_BUILD_TYPE="Release"        \
         -DLIB_TYPE="$lib_type"              \
@@ -47,36 +66,20 @@ fi | while read testcase ; do
         -DWEAK_LINK_EXE="$weak_link_exe"    \
             &> "../../log/$testcase/configure.txt"
     configure_result="$?"
+    [[ $configure_result == 0 ]] && result="pass" || result="fail"
+    configure_result=$(colorized_message $configure_result $result)
 
+    # build
     make VERBOSE=1 &> "../../log/$testcase/build.txt"
     build_result="$?"
+    [[ $build_result == 0 ]] && result="pass" || result="fail"
+    build_result=$(colorized_message $build_result $result)
 
+    # test
     ./main &> "../../log/$testcase/test.txt"
     test_result="$?"
-
-    code=32
-    result=pass
-    if [ "$configure_result" '!=' '0' ] ; then
-        code=31
-        result=fail
-    fi
-    configure_result="\\e[1;${code}m${result}\\e[0m"
-    configure_result="$( echo -e "$configure_result" )"
-
-    code=32
-    result=pass
-    if [ "$build_result" '!=' '0' ] ; then
-        code=31
-        result=fail
-    fi
-    build_result="\\e[1;${code}m${result}\\e[0m"
-    build_result="$( echo -e "$build_result" )"
-
-    code=32
     result=pass
     if [ "$test_result" '!=' '0' ] ; then
-        code=31
-
         result="RTE"
 
         if [ "$test_result" '=' '250' ] ; then # wrong answer
@@ -85,9 +88,9 @@ fi | while read testcase ; do
             result="DLLF"
         fi
     fi
-    test_result="\\e[1;${code}m${result}\\e[0m"
-    test_result="$( echo -e "$test_result" )"
+    test_result=$(colorized_message $test_result $result)
 
+    # summary
     echo "$testcase   $configure_result   $build_result   $test_result"
 
     popd &> /dev/null
