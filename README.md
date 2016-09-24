@@ -64,9 +64,9 @@ symbols", and `DLLF` for "dynamic library load failure".
 |CASE|CONFIG            |BUILD             |TEST              |NOTES|
 |----|------------------|------------------|------------------|----:|
 |s00 |:white_check_mark:|:white_check_mark:|:x:RTE            |  1,2|
-|s01 |:white_check_mark:|:white_check_mark:|:x:DSYM           |    3|
+|s01 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    5|
 |s10 |:white_check_mark:|:white_check_mark:|:x:RTE            |    2|
-|s11 |:white_check_mark:|:white_check_mark:|:x:DSYM           |    4|
+|s11 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    7|
 |d00 |:white_check_mark:|:white_check_mark:|:x:RTE            |    2|
 |d01 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    5|
 |d10 |:white_check_mark:|:white_check_mark:|:x:RTE            |    2|
@@ -89,25 +89,25 @@ symbols", and `DLLF` for "dynamic library load failure".
 
   1. Test fails due to unresolved symbols.
 
-  1. On Linux, all symbols in a binary's namespace must be resolved when the
+  2. On Linux, all symbols in a binary's namespace must be resolved when the
      namespace is instantiated.  Because of this requirement, leaving symbols
      unresolved in an executable is almost never useful, since the missing
      symbols must be provided before the executable is even ran (e.g.: using
      `LD_PRELOAD`).
 
-  1. In the actual system test, the produced binary fails due to unresolved
+  3. In the actual system test, the produced binary fails due to unresolved
      symbols in the module's namespace.  The result is reported as symbol
      duplication because the check falls back to double-linking in an attempt to
      produce a working executable (with the same result as the `s11` case).
 
-  1. Test case fails unique symbols test (program output looks like
+  4. Test case fails unique symbols test (program output looks like
     `0 0 1 1 2 2 ...` instead of `0 1 2 ...`).
 
-  1. Module pulls symbols from the executable (ala Python extension modules).
+  5. Module pulls symbols from the executable (ala Python extension modules).
 
-  1. Executable pulls symbols from the module (unusual, but it works).
+  6. Executable pulls symbols from the module (unusual, but it works).
 
-  1. Duplicate symbols are successfully resolved and coalesced at load time.
+  7. Duplicate symbols are successfully resolved and coalesced at load time.
 
 Tested on:
 
