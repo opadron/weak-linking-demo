@@ -95,6 +95,21 @@ fi | while read testcase ; do
     # summary
     echo "$testcase   $configure_result   $build_result   $test_result"
 
+    [[ "$VERBOSE" == "" ]] && VERBOSE=0
+    if [ $VERBOSE == "1" ]; then
+        echo ""
+        echo "CONFIGURE LOG:"
+        cat ../../log/$testcase/configure.txt
+
+        echo ""
+        echo "BUILD LOG:"
+        cat ../../log/$testcase/build.txt
+
+        echo ""
+        echo "TEST LOG:"
+        cat ../../log/$testcase/test.txt
+    fi
+
     popd &> /dev/null
 done 2> /dev/null
 

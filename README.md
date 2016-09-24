@@ -30,7 +30,9 @@ Dependency graph looks like this:
 
 #### Instructions
 
-Add CMake >= 3.5 in your PATH
+1. Add CMake >= 3.5 in your PATH
+
+2. Run all tests
 
 ```
 git clone git://github.com/opadron/weak-linking-demo
@@ -43,6 +45,8 @@ build the LIB statically (s) or dynamically (d), whether to normally link it
 into the MOD (1) or to weakly link it (0), and whether to normally link it into
 the EXE (1) or to weakly link it (0).
 
+3. Run a single test case
+
 ```
 ./enumerateBuild.bash d01
   or
@@ -52,6 +56,16 @@ the EXE (1) or to weakly link it (0).
 Will test (or run) the build that was configured to build the LIB dynamically
 (d), normally link it into the MOD (1), and weakly link it into the EXE (0).
 Replace "d10" with your desired combination to run that particular build.
+
+
+4. Run a single testcase displaying log outputs
+
+For convenience, log files will be displayed setting ``VERBOSE=1``.
+
+```
+VERBOSE=1 ./enumerateBuild.bash d01
+```
+
 
 ##### Expected Results
 
