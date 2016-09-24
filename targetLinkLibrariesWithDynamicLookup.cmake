@@ -304,6 +304,7 @@ function(_test_weak_link_project
                 "${project_name}"
                 CMAKE_FLAGS
                   "-DCMAKE_SHARED_LINKER_FLAGS='${CMAKE_SHARED_LINKER_FLAGS}'"
+                  "-DCMAKE_ENABLE_EXPORTS=ON"
                   ${_rpath_arg}
                 OUTPUT_VARIABLE compile_output)
 

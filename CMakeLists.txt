@@ -27,6 +27,13 @@ else()
     target_link_libraries(counter number)
 endif()
 
+# Sanity check
+get_target_property(mod_link_libs counter INTERFACE_LINK_LIBRARIES)
+list(FIND mod_link_libs number is_mod_link_against_number)
+if(WEAK_LINK_MODULE AND NOT is_mod_link_against_number EQUAL -1)
+    message(FATAL_ERROR "Weak linking failed. LIB is NOT expected to be in MOD link libraries")
+endif()
+
 
 # EXECUTABLE (main)
 add_executable(main main.c)
@@ -36,6 +43,13 @@ else()
     target_link_libraries(main number)
 endif()
 target_link_libraries(main ${CMAKE_DL_LIBS})
+
+# Sanity check
+get_target_property(exe_link_libs main INTERFACE_LINK_LIBRARIES)
+list(FIND exe_link_libs number is_exe_link_against_number)
+if(WEAK_LINK_EXE AND NOT is_exe_link_against_number EQUAL -1)
+    message(FATAL_ERROR "Weak linking failed. LIB is NOT expected to be in EXE link libraries")
+endif()
 
 add_test(NAME main COMMAND main)
 

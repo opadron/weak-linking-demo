@@ -62,6 +62,7 @@ fi | while read testcase ; do
     # configure
     cmake ../..                             \
         -DCMAKE_BUILD_TYPE="Release"        \
+        -DCMAKE_ENABLE_EXPORTS="1"          \
         -DLIB_TYPE="$lib_type"              \
         -DWEAK_LINK_MODULE="$weak_link_mod" \
         -DWEAK_LINK_EXE="$weak_link_exe"    \
