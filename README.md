@@ -64,9 +64,9 @@ symbols", and `DLLF` for "dynamic library load failure".
 |CASE|CONFIG            |BUILD             |TEST              |NOTES|
 |----|------------------|------------------|------------------|----:|
 |s00 |:white_check_mark:|:white_check_mark:|:x:RTE            |  1,2|
-|s01 |:white_check_mark:|:white_check_mark:|:x:DSYM           |    3|
+|s01 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    5|
 |s10 |:white_check_mark:|:white_check_mark:|:x:RTE            |    2|
-|s11 |:white_check_mark:|:white_check_mark:|:x:DSYM           |    4|
+|s11 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    7|
 |d00 |:white_check_mark:|:white_check_mark:|:x:RTE            |    2|
 |d01 |:white_check_mark:|:white_check_mark:|:white_check_mark:|    5|
 |d10 |:white_check_mark:|:white_check_mark:|:x:RTE            |    2|
