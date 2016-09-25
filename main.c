@@ -24,8 +24,8 @@ int main(int argc, char **argv) {
     if(!count) goto error;
 
     result = 0;
-    for(i=0; i<10; ++i) {
-        n = ((i%2) ? count : my_count)();
+    for( i = 0; i < 10; ++i) {
+        n = ( ( i % 2 ) ? count : my_count )();
         result = (result || n != i) ? 250 : 0;
         printf("%d\n", n);
     }
