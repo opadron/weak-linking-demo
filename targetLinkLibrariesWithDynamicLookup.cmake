@@ -392,9 +392,7 @@ function(check_dynamic_lookup
   if(NOT DEFINED ${cache_var})
     set(skip_test FALSE)
 
-    if(NOT CMAKE_CROSSCOMPILING)
-      set(skip_test TRUE)
-    elseif(CMAKE_CROSSCOMPILING AND CMAKE_CROSSCOMPILING_EMULATOR)
+   if(CMAKE_CROSSCOMPILING AND NOT CMAKE_CROSSCOMPILING_EMULATOR)
       set(skip_test TRUE)
     endif()
 
