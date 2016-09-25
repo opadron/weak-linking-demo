@@ -102,7 +102,10 @@
 # weak-linking, this function works just like ``target_link_libraries``.
 
 function(_get_target_type result_var target)
-  get_property(target_type TARGET ${target} PROPERTY TYPE)
+  set(target_type "SHARED_LIBRARY")
+  if(TARGET ${target})
+    get_property(target_type TARGET ${target} PROPERTY TYPE)
+  endif()
 
   set(result "STATIC")
 
@@ -165,8 +168,6 @@ function(_test_weak_link_project
 
     if("${mod_type}" STREQUAL "MODULE")
       set(link_mod_lib FALSE)
-    else()
-      set(link_exe_mod TRUE)
     endif()
 
 
@@ -221,33 +222,55 @@ function(_test_weak_link_project
     endif()
 
     file(WRITE "${test_project_src_dir}/number.c" "
+      #include <number.h>
+
       static int _number;
-      int next_number() { return _number++; }
+      void set_number(int number) { _number = number; }
+      int get_number() { return _number; }
+    ")
+
+    file(WRITE "${test_project_src_dir}/number.h" "
+      #ifndef _NUMBER_H
+      #define _NUMBER_H
+      extern void set_number(int);
+      extern int get_number(void);
+      #endif
     ")
 
     file(WRITE "${test_project_src_dir}/counter.c" "
-      extern int next_number(void);
-      int count() { return next_number(); }
+      #include <number.h>
+      int count() {
+        int result = get_number();
+        set_number(result + 1);
+        return result;
+      }
+    ")
+
+    file(WRITE "${test_project_src_dir}/counter.h" "
+      #ifndef _COUNTER_H
+      #define _COUNTER_H
+      extern int count(void);
+      #endif
     ")
 
     file(WRITE "${test_project_src_dir}/main.c" "
       #include <stdlib.h>
       #include <stdio.h>
+      #include <number.h>
     ")
 
-    if(link_exe_mod)
-      file(APPEND "${test_project_src_dir}/main.c" "
-        extern int count(void);
-      ")
-    else()
+    if(NOT link_exe_mod)
       file(APPEND "${test_project_src_dir}/main.c" "
         #include <dlfcn.h>
       ")
     endif()
 
     file(APPEND "${test_project_src_dir}/main.c" "
-      extern int next_number(void);
-      int my_count() { return next_number(); }
+      int my_count() {
+        int result = get_number();
+        set_number(result + 1);
+        return result;
+      }
 
       int main(int argc, char **argv) {
         int result;
@@ -267,13 +290,13 @@ function(_test_weak_link_project
     endif()
 
     file(APPEND "${test_project_src_dir}/main.c" "
-        result = count()    != 0 ? 1 :
-                 my_count() != 1 ? 1 :
-                 my_count() != 2 ? 1 :
-                 count()    != 3 ? 1 :
-                 count()    != 4 ? 1 :
-                 count()    != 5 ? 1 :
-                 my_count() != 6 ? 1 : 0;
+        result = count()    != 0 ? EXIT_FAILURE :
+                 my_count() != 1 ? EXIT_FAILURE :
+                 my_count() != 2 ? EXIT_FAILURE :
+                 count()    != 3 ? EXIT_FAILURE :
+                 count()    != 4 ? EXIT_FAILURE :
+                 count()    != 5 ? EXIT_FAILURE :
+                 my_count() != 6 ? EXIT_FAILURE : EXIT_SUCCESS;
     ")
 
     if(NOT link_exe_mod)
@@ -367,14 +390,22 @@ function(check_dynamic_lookup
   endif()
 
   if(NOT DEFINED ${cache_var})
-    if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
+    set(skip_test FALSE)
+
+    if(NOT CMAKE_CROSSCOMPILING)
+      set(skip_test TRUE)
+    elseif(CMAKE_CROSSCOMPILING AND CMAKE_CROSSCOMPILING_EMULATOR)
+      set(skip_test TRUE)
+    endif()
+
+    if(skip_test)
+      set(has_dynamic_lookup FALSE)
+      set(link_flags)
+    else()
       _test_weak_link_project(${target_type}
                               ${lib_type}
                               has_dynamic_lookup
                               link_flags)
-    else()
-      set(has_dynamic_lookup FALSE)
-      set(link_flags)
     endif()
 
     set(caveat " (when linking ${target_type} against ${lib_type})")
